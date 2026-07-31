@@ -2,36 +2,74 @@ import "./styles.css";
 import Todo from "./modules/todo.js";
 import Project from "./modules/project.js";
 import ProjectManager from "./modules/projectManager.js";
+import createLayout from "./modules/dom.js";
+import { renderProjects, renderTodos } from "./modules/render.js";
 
-
+createLayout();
 
 const manager = new ProjectManager();
-const defaultProject = new Project("Defualt");
+const defaultProject = new Project("Default");
 
 manager.addProject(defaultProject);
 
+let currentProject = defaultProject;
+
 defaultProject.addTodo(
-    new Todo(
-        "Finish Odin Project",
-        "Complete the Todo List application",
-        "high",
-        "2026-08-05"
-    )
+  new Todo(
+    "Finish Odin Project",
+    "Complete the Todo List application",
+    "High",
+    "2026-08-05",
+  ),
 );
+defaultProject.addTodo(new Todo("Gym", "Leg day", "Low", "2026-07-29"));
 defaultProject.addTodo(
-    new Todo(
-        "Gym",
-        "Leg day",
-        "Low",
-        "2026-07-29"
-    )
+  new Todo("JavaScript", "Study all of JS", "High", "2026-08-01"),
 );
-defaultProject.addTodo(
-    new Todo(
-        "JavaScript",
-        "Study all of JS",
-        "High",
-        "2026-08-01"
-    )
-)
-console.log(manager.getProjects());
+renderProjects(manager);
+renderTodos(currentProject);
+
+const addProjectBtn = document.querySelector(".add-project-btn");
+
+addProjectBtn.addEventListener("click", ()=>{
+    const name = prompt("Enter project name:");
+    if (!name || name.trim() === "") return;
+
+    const project = new Project(name);
+    manager.addProject(project);
+
+    currentProject = project;
+
+    renderProjects(manager, (project) => {
+        currentProject = project;
+        renderTodos(currentProject);
+    });
+    renderTodos(currentProject);
+});
+
+const addTodoBtn = document.querySelector(".add-todo-btn");
+const todoForm = document.querySelector(".todo-form");
+addTodoBtn.addEventListener("click", () => {
+    todoForm.style.display = "flex";
+});
+todoForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(todoForm);
+
+    const title = formData.get("title");
+    const description = formData.get("description");
+    const priority = formData.get("priority");
+    const dueDate = formData.get("dueDate");
+
+    // creating the to do
+    const todo = new Todo(
+        title,
+        description,
+        priority,
+        dueDate
+    );
+    currentProject.addTodo(todo);
+    renderTodos(currentProject);
+    todoForm.reset();
+    todoForm.style.display = "none";
+});
