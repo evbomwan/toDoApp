@@ -39,3 +39,17 @@ button {
     flex-direction: column;
     gap: 1rem;
 }
+/* priority */
+.high{
+    color: red;
+    font-weight: bold;
+}
+.medium {
+    color: orange;
+    font-weight: bold;
+}
+
+.low {
+    color: green;
+    font-weight: bold;
+}

@@ -14,20 +14,39 @@ manager.addProject(defaultProject);
 
 let currentProject = defaultProject;
 
+// Separate function to handle todo deletion
+function handleDeleteTodo(todoId) {
+    currentProject.removeTodo(todoId);
+    renderTodos(currentProject, handleDeleteTodo); // Pass the same function
+}
+
+// Function to update todos display
+function updateTodos() {
+    renderTodos(currentProject, handleDeleteTodo);
+}
+
+function selectProject(project) {
+    currentProject = project;
+    updateTodos();
+}
+
+// Add default todos
 defaultProject.addTodo(
-  new Todo(
-    "Finish Odin Project",
-    "Complete the Todo List application",
-    "High",
-    "2026-08-05",
-  ),
+    new Todo(
+        "Finish Odin Project",
+        "Complete the Todo List application",
+        "High",
+        "2026-08-05",
+    ),
 );
 defaultProject.addTodo(new Todo("Gym", "Leg day", "Low", "2026-07-29"));
 defaultProject.addTodo(
-  new Todo("JavaScript", "Study all of JS", "High", "2026-08-01"),
+    new Todo("JavaScript", "Study all of JS", "High", "2026-08-01"),
 );
-renderProjects(manager);
-renderTodos(currentProject);
+
+// Initial render with selectProject callback
+renderProjects(manager, selectProject);
+updateTodos(); // Use updateTodos instead of direct renderTodos
 
 const addProjectBtn = document.querySelector(".add-project-btn");
 
@@ -38,20 +57,17 @@ addProjectBtn.addEventListener("click", ()=>{
     const project = new Project(name);
     manager.addProject(project);
 
-    currentProject = project;
-
-    renderProjects(manager, (project) => {
-        currentProject = project;
-        renderTodos(currentProject);
-    });
-    renderTodos(currentProject);
+    selectProject(project);
+    renderProjects(manager, selectProject);
 });
 
 const addTodoBtn = document.querySelector(".add-todo-btn");
 const todoForm = document.querySelector(".todo-form");
+
 addTodoBtn.addEventListener("click", () => {
     todoForm.style.display = "flex";
 });
+
 todoForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(todoForm);
@@ -61,7 +77,11 @@ todoForm.addEventListener("submit", (event) => {
     const priority = formData.get("priority");
     const dueDate = formData.get("dueDate");
 
-    // creating the to do
+    if (!title || !title.trim()) {
+        alert("Please enter a title");
+        return;
+    }
+
     const todo = new Todo(
         title,
         description,
@@ -69,7 +89,7 @@ todoForm.addEventListener("submit", (event) => {
         dueDate
     );
     currentProject.addTodo(todo);
-    renderTodos(currentProject);
+    updateTodos();
     todoForm.reset();
     todoForm.style.display = "none";
 });
