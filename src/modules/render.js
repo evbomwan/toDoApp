@@ -44,10 +44,22 @@ export function renderTodos(project, onDeleteTodo) {
     checkbox.type = "checkbox";
     checkbox.checked = todo.completed;
     checkbox.classList.add("todo-checkbox");
+    checkbox.addEventListener("change", () => {
+      todo.completed = checkbox.checked;
+      if (todo.completed) {
+        title.classList.add("completed");
+      } else {
+        title.classList.remove("completed");
+      }
+    });
 
     const title = document.createElement("h3");
     title.textContent = todo.title || "Untitled";
     title.classList.add("todo-title");
+
+    if(todo.completed) {
+      title.classList.add("completed");
+    }
 
     const priority = document.createElement("span");
     priority.textContent = todo.priority || "Medium";
