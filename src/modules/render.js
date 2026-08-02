@@ -8,7 +8,7 @@ export function renderProjects(projectManager, selectProject) {
     projectBtn.classList.add("project-btn");
     projectBtn.textContent = project.name;
     projectBtn.addEventListener("click", () => {
-      if (selectProject && typeof selectProject === 'function') {
+      if (selectProject && typeof selectProject === "function") {
         selectProject(project);
       }
     });
@@ -21,7 +21,7 @@ export function renderTodos(project, onDeleteTodo) {
   const todoList = document.querySelector(".todo-list");
 
   todoList.innerHTML = "";
-  
+
   // Check if project has todos
   const todos = project.getTodos();
   if (!todos || todos.length === 0) {
@@ -31,7 +31,7 @@ export function renderTodos(project, onDeleteTodo) {
     todoList.append(emptyMessage);
     return;
   }
-  
+
   todos.forEach((todo) => {
     const card = document.createElement("div");
     card.classList.add("todo-card");
@@ -57,7 +57,7 @@ export function renderTodos(project, onDeleteTodo) {
     title.textContent = todo.title || "Untitled";
     title.classList.add("todo-title");
 
-    if(todo.completed) {
+    if (todo.completed) {
       title.classList.add("completed");
     }
 
@@ -65,24 +65,21 @@ export function renderTodos(project, onDeleteTodo) {
     priority.textContent = todo.priority || "Medium";
     priority.classList.add(
       "priority",
-       todo.priority?.toLowerCase() || "medium");
+      todo.priority?.toLowerCase() || "medium",
+    );
 
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Delete";
     deleteBtn.classList.add("delete-btn");
     deleteBtn.dataset.id = todo.id;
     deleteBtn.addEventListener("click", () => {
-      if (onDeleteTodo && typeof onDeleteTodo === 'function') {
+      if (onDeleteTodo && typeof onDeleteTodo === "function") {
         onDeleteTodo(todo.id);
       }
     });
-    header.append(
-      checkbox,
-      title,
-      priority
-    );
+    header.append(checkbox, title, priority);
 
-     const dueDate = document.createElement("p");
+    const dueDate = document.createElement("p");
     dueDate.textContent = `Due: ${todo.dueDate || "No due date"}`;
     dueDate.classList.add("todo-date");
 
@@ -96,12 +93,19 @@ export function renderTodos(project, onDeleteTodo) {
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.classList.add("edit-btn");
+    editBtn.addEventListener("click", () => {
+      // visible details section
+      details.hidden = false;
+      detailsBtn.textContent = "Hide";
+      // switch from view to edit
+      description.hidden = true;
+      descriptionInput.hidden = false;
+      saveBtn.hidden = false;
+      cancelBtn.hidden = false;
+      editBtn.hidden = true;
+    })
 
-    actions.append(
-      detailsBtn,
-      editBtn,
-      deleteBtn
-    );
+    actions.append(detailsBtn, editBtn, deleteBtn);
 
     const details = document.createElement("div");
     details.classList.add("todo-details");
@@ -114,17 +118,31 @@ export function renderTodos(project, onDeleteTodo) {
       } else {
         detailsBtn.textContent = "Hide";
       }
-    })
+    });
 
     const description = document.createElement("p");
     description.classList.add("todo-description");
     description.textContent = todo.description || "No description provided";
-    
-    details.append(description);
-    card.append(header,
-      dueDate,
-    actions,
-  details);
+
+    const descriptionInput = document.createElement("textarea");
+    descriptionInput.value = todo.description || "";
+    descriptionInput.classList.add("description-input");
+    descriptionInput.hidden = true;
+
+    const saveBtn = document.createElement("button");
+    saveBtn.textContent = "Save";
+    saveBtn.classList.add("save-btn");
+    saveBtn.hidden = true;
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.classList.add("cancel-btn");
+    cancelBtn.hidden = true;
+
+    details.append(description, descriptionInput, saveBtn, cancelBtn);
+
+    card.append(header, dueDate, actions, details);
+
     todoList.append(card);
   });
 }
