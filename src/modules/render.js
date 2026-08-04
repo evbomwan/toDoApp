@@ -93,17 +93,6 @@ export function renderTodos(project, onDeleteTodo) {
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.classList.add("edit-btn");
-    editBtn.addEventListener("click", () => {
-      // visible details section
-      details.hidden = false;
-      detailsBtn.textContent = "Hide";
-      // switch from view to edit
-      description.hidden = true;
-      descriptionInput.hidden = false;
-      saveBtn.hidden = false;
-      cancelBtn.hidden = false;
-      editBtn.hidden = true;
-    })
 
     actions.append(detailsBtn, editBtn, deleteBtn);
 
@@ -115,6 +104,7 @@ export function renderTodos(project, onDeleteTodo) {
 
       if (details.hidden) {
         detailsBtn.textContent = "Details";
+        exitEditMode();
       } else {
         detailsBtn.textContent = "Hide";
       }
@@ -139,10 +129,37 @@ export function renderTodos(project, onDeleteTodo) {
     cancelBtn.classList.add("cancel-btn");
     cancelBtn.hidden = true;
 
+    function enterEditMode() {
+      details.hidden = false;
+      detailsBtn.textContent = "Hide";
+      description.hidden = true;
+      descriptionInput.hidden = false;
+      saveBtn.hidden = false;
+      cancelBtn.hidden = false;
+      editBtn.hidden = true;
+    }
+    function exitEditMode() {
+      description.hidden = false;
+      descriptionInput.hidden = true;
+      saveBtn.hidden = true;
+      cancelBtn.hidden = true;
+      editBtn.hidden = false;
+    }
+
     details.append(description, descriptionInput, saveBtn, cancelBtn);
 
     card.append(header, dueDate, actions, details);
 
+    editBtn.addEventListener("click", enterEditMode);
+    cancelBtn.addEventListener("click", () => {
+      descriptionInput.value = todo.description || "";
+      exitEditMode();
+    });
+    saveBtn.addEventListener("click", () => {
+      todo.editTodo({description: descriptionInput.value});
+      description.textContent = todo.description || "No description provided";
+      exitEditMode();
+    })
     todoList.append(card);
   });
 }
