@@ -4,25 +4,35 @@ import Project from "./modules/project.js";
 import ProjectManager from "./modules/projectManager.js";
 import createLayout from "./modules/dom.js";
 import { renderProjects, renderTodos } from "./modules/render.js";
+import { saveProjects, loadProjects } from "./modules/storage.js";
 
 createLayout();
 
-const manager = new ProjectManager();
-const defaultProject = new Project("Default");
+let manager = loadProjects();
 
-manager.addProject(defaultProject);
+if (!manager) {
+    manager = new ProjectManager();
+    
+    const defaultProject = new Project("Default");
+    manager.addProject(defaultProject);
+}
+let currentProject = manager.getProjects()[0];
 
-let currentProject = defaultProject;
-
+function persist() {
+    saveProjects(manager);
+}
+function handleUpdateTodo() {
+    persist();
+}
 // Separate function to handle todo deletion
 function handleDeleteTodo(todoId) {
     currentProject.removeTodo(todoId);
-    renderTodos(currentProject, handleDeleteTodo); // Pass the same function
+    renderTodos(currentProject, handleDeleteTodo, handleUpdateTodo); 
+    persist();
 }
-
 // Function to update todos display
 function updateTodos() {
-    renderTodos(currentProject, handleDeleteTodo);
+    renderTodos(currentProject, handleDeleteTodo, handleUpdateTodo);
 }
 
 function selectProject(project) {
@@ -30,23 +40,38 @@ function selectProject(project) {
     updateTodos();
 }
 
-// Add default todos
-defaultProject.addTodo(
-    new Todo(
-        "Finish Odin Project",
-        "Complete the Todo List application",
-        "High",
-        "2026-08-05",
-    ),
-);
-defaultProject.addTodo(new Todo("Gym", "Leg day", "Low", "2026-07-29"));
-defaultProject.addTodo(
-    new Todo("JavaScript", "Study all of JS", "High", "2026-08-01"),
-);
+// Add default todos only on the first run
+if (manager.getProjects()[0].getTodos().length === 0) {
+    manager.getProjects()[0].addTodo(
+        new Todo(
+            "Finish Odin Project",
+            "Complete the Todo List application",
+            "High",
+            "2026-08-05"
+        )
+    );
+    manager.getProjects()[0].addTodo(
+        new Todo(
+            "Gym",
+            "Leg day",
+            "Low",
+            "2026-07-29"
+        )
+    );
+    manager.getProjects()[0].addTodo(
+        new Todo(
+            "JavaScript",
+            "Study all of JS",
+            "High",
+            "2026-08-01"
+        )
+    );
+}
 
 // Initial render with selectProject callback
 renderProjects(manager, selectProject);
-updateTodos(); // Use updateTodos instead of direct renderTodos
+updateTodos();
+persist();
 
 const addProjectBtn = document.querySelector(".add-project-btn");
 
@@ -59,6 +84,7 @@ addProjectBtn.addEventListener("click", ()=>{
 
     selectProject(project);
     renderProjects(manager, selectProject);
+    persist();
 });
 
 const addTodoBtn = document.querySelector(".add-todo-btn");
@@ -90,6 +116,7 @@ todoForm.addEventListener("submit", (event) => {
     );
     currentProject.addTodo(todo);
     updateTodos();
+    persist();
     todoForm.reset();
     todoForm.style.display = "none";
 });

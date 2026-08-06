@@ -17,7 +17,7 @@ export function renderProjects(projectManager, selectProject) {
 }
 
 // to render the the to do in a project
-export function renderTodos(project, onDeleteTodo) {
+export function renderTodos(project, onDeleteTodo, onUpdateTodo) {
   const todoList = document.querySelector(".todo-list");
 
   todoList.innerHTML = "";
@@ -50,7 +50,11 @@ export function renderTodos(project, onDeleteTodo) {
         title.classList.add("completed");
       } else {
         title.classList.remove("completed");
+      };
+      if (typeof onUpdateTodo === "function"){
+        onUpdateTodo();
       }
+
     });
 
     const title = document.createElement("h3");
@@ -159,6 +163,9 @@ export function renderTodos(project, onDeleteTodo) {
       todo.editTodo({description: descriptionInput.value});
       description.textContent = todo.description || "No description provided";
       exitEditMode();
+      if (typeof onUpdateTodo === "function"){
+        onUpdateTodo();
+      }
     })
     todoList.append(card);
   });

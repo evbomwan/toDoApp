@@ -26,25 +26,41 @@ export function saveProjects(projectManager) {
 export function loadProjects() {
     try {
         const storedData = localStorage.getItem(STORAGE_KEY);
-        if (!storageData) return null;
+
+        if (!storedData) return null;
 
         const projectsData = JSON.parse(storedData);
-        if (!Array.isArray(projectsData) || projectsData.length === 0) return null;
+
+        if (!Array.isArray(projectsData) || projectsData.length === 0) {
+            return null;
+        }
 
         const manager = new ProjectManager();
 
-        projectsData.todos.forEach(todoData => {
-            const todo = new Todo(
-                todoData.title,
-                todoData.description || "",
-                todoData.priority || "Medium",
-                todoData.dueDate || ""
-            );
-            // preserve original ID
-            if (todoData.id) {
+        projectsData.forEach((projectData) => {
+            const project = new Project(projectData.name);
+
+            projectData.todos.forEach((todoData) => {
+                const todo = new Todo(
+                    todoData.title,
+                    todoData.description || "",
+                    todoData.priority || "Medium",
+                    todoData.dueDate || ""
+                );
+
                 todo.id = todoData.id;
-            }
-            // if a to do was completed
+                todo.completed = todoData.completed || false;
+
+                project.addTodo(todo);
+            });
+
+            manager.addProject(project);
         });
+
+        return manager;
+
+    } catch (error) {
+        console.log("Error loading from localStorage:", error);
+        return null;
     }
 }
