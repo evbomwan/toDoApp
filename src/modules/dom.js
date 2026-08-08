@@ -14,7 +14,28 @@ export default function createLayout() {
   addProjectBtn.textContent = "+ New Project";
   addProjectBtn.classList.add("add-project-btn");
 
-  sideBar.append(sideBarTitle, projectList, addProjectBtn);
+  const projectForm = document.createElement("form");
+  projectForm.classList.add("project-form");
+  projectForm.style.display = "none";
+
+  const projectNameInput = document.createElement("input");
+  projectNameInput.type = "text";
+  projectNameInput.placeholder = "Project name";
+  projectNameInput.name = "projectName";
+  projectNameInput.required = true;
+
+  const projectSubmitBtn = document.createElement("button");
+  projectSubmitBtn.type = "submit";
+  projectSubmitBtn.textContent = "Add Project";
+
+  const projectCancelBtn = document.createElement("button");
+  projectCancelBtn.type = "button";
+  projectCancelBtn.textContent = "Cancel";
+  projectCancelBtn.classList.add("cancel-project-btn");
+
+  projectForm.append(projectNameInput, projectSubmitBtn, projectCancelBtn);
+
+  sideBar.append(sideBarTitle, projectList, addProjectBtn, projectForm);
 
   const content = document.createElement("main");
   content.classList.add("content");
@@ -28,7 +49,7 @@ export default function createLayout() {
   const addTodoBtn = document.createElement("button");
   addTodoBtn.textContent = "+ New Todo";
   addTodoBtn.classList.add("add-todo-btn");
-// the form for adding a new to do
+
   const todoForm = document.createElement("form");
   todoForm.classList.add("todo-form");
   todoForm.style.display = "none";

@@ -50,11 +50,10 @@ export function renderTodos(project, onDeleteTodo, onUpdateTodo) {
         title.classList.add("completed");
       } else {
         title.classList.remove("completed");
-      };
-      if (typeof onUpdateTodo === "function"){
+      }
+      if (typeof onUpdateTodo === "function") {
         onUpdateTodo();
       }
-
     });
 
     const title = document.createElement("h3");
@@ -117,6 +116,34 @@ export function renderTodos(project, onDeleteTodo, onUpdateTodo) {
     const description = document.createElement("p");
     description.classList.add("todo-description");
     description.textContent = todo.description || "No description provided";
+    // editable title
+    const titleInput = document.createElement("input");
+    titleInput.type = "text";
+    titleInput.value = todo.title;
+    titleInput.classList.add("title-input");
+    titleInput.hidden = true;
+
+    const prioritySelect = document.createElement("select");
+    prioritySelect.classList.add("priority-select");
+    prioritySelect.hidden = true;
+
+    ["High", "Medium", "Low"].forEach((level) => {
+      const option = document.createElement("option");
+      option.value = level;
+      option.textContent = level;
+
+      if (level === todo.priority) {
+        option.selected = true;
+      }
+
+      prioritySelect.append(option);
+    });
+    // editable due date
+    const dueDateInput = document.createElement("input");
+    dueDateInput.type = "date";
+    dueDateInput.value = todo.dueDate;
+    dueDateInput.classList.add("due-date-input");
+    dueDateInput.hidden = true;
 
     const descriptionInput = document.createElement("textarea");
     descriptionInput.value = todo.description || "";
@@ -136,37 +163,72 @@ export function renderTodos(project, onDeleteTodo, onUpdateTodo) {
     function enterEditMode() {
       details.hidden = false;
       detailsBtn.textContent = "Hide";
+
+      titleInput.hidden = false;
+
       description.hidden = true;
       descriptionInput.hidden = false;
+
+      prioritySelect.hidden = false;
+
+      dueDateInput.hidden = false;
+
       saveBtn.hidden = false;
       cancelBtn.hidden = false;
+
       editBtn.hidden = true;
     }
+
     function exitEditMode() {
       description.hidden = false;
       descriptionInput.hidden = true;
+
+      titleInput.hidden = true;
+      prioritySelect.hidden = true;
+      dueDateInput.hidden = true;
+
       saveBtn.hidden = true;
       cancelBtn.hidden = true;
+
       editBtn.hidden = false;
     }
 
-    details.append(description, descriptionInput, saveBtn, cancelBtn);
+    details.append(
+      titleInput,
+      description,
+      descriptionInput,
+      prioritySelect,
+      dueDateInput,
+      saveBtn,
+      cancelBtn,
+    );
 
     card.append(header, dueDate, actions, details);
-
     editBtn.addEventListener("click", enterEditMode);
-    cancelBtn.addEventListener("click", () => {
-      descriptionInput.value = todo.description || "";
-      exitEditMode();
-    });
+    titleInput.value = todo.title || "";
+    descriptionInput.value = todo.description || "";
+    prioritySelect.value = todo.priority || "Medium";
+    dueDateInput.value = todo.dueDate || "";
+    exitEditMode();
+
     saveBtn.addEventListener("click", () => {
-      todo.editTodo({description: descriptionInput.value});
+      todo.editTodo({
+        title: titleInput.value,
+        description: descriptionInput.value,
+        priority: prioritySelect.value,
+        dueDate: dueDateInput.value,
+      });
+
+      title.textContent = todo.title;
       description.textContent = todo.description || "No description provided";
+      priority.textContent = todo.priority;
+
+      dueDate.textContent = `Due: ${todo.dueDate || "No due date"}`;
       exitEditMode();
-      if (typeof onUpdateTodo === "function"){
+      if (typeof onUpdateTodo === "function") {
         onUpdateTodo();
       }
-    })
+    });
     todoList.append(card);
   });
 }
