@@ -366,3 +366,15 @@ button {
     background: #2d2d44;
     color: #e5e7eb;
 }
+.project-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.project-item .project-btn {
+  flex: 1;
+}
+.project-item .delete-btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+}

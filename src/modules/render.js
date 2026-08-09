@@ -1,9 +1,12 @@
 // to render the project
-export function renderProjects(projectManager, selectProject) {
+export function renderProjects(projectManager, selectProject, onDeleteProject) {
   const projectList = document.querySelector(".project-list");
 
   projectList.innerHTML = "";
   projectManager.getProjects().forEach((project) => {
+    const projectItem = document.createElement("div");
+    projectItem.classList.add("project-item");
+
     const projectBtn = document.createElement("button");
     projectBtn.classList.add("project-btn");
     projectBtn.textContent = project.name;
@@ -12,11 +15,22 @@ export function renderProjects(projectManager, selectProject) {
         selectProject(project);
       }
     });
-    projectList.append(projectBtn);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.classList.add("delete-btn");
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (onDeleteProject && typeof onDeleteProject === "function") {
+        onDeleteProject(project.name);
+      }
+    });
+
+    projectItem.append(projectBtn, deleteBtn);
+    projectList.append(projectItem);
   });
 }
-
-// to render the the to do in a project
+// to render the todo in a project
 export function renderTodos(project, onDeleteTodo, onUpdateTodo) {
   const todoList = document.querySelector(".todo-list");
 

@@ -30,6 +30,24 @@ function handleDeleteTodo(todoId) {
   renderTodos(currentProject, handleDeleteTodo, handleUpdateTodo);
   persist();
 }
+// function for deleting project
+function handleDeleteProject(projectName) {
+  if (!confirm(`Delete project "${projectName}"?`)) return;
+
+  const wasCurrent = currentProject && currentProject.name === projectName;
+  manager.removeProject(projectName);
+
+  if (manager.getProjects().length === 0) {
+    const defaultProject = new Project("Default");
+    manager.addProject(defaultProject);
+    currentProject = defaultProject;
+  } else if (wasCurrent) {
+    currentProject = manager.getProjects()[0];
+  }
+  renderProjects(manager, selectProject, handleDeleteProject);
+  updateTodos();
+  persist();
+}
 // Function to update todos display
 function updateTodos() {
   renderTodos(currentProject, handleDeleteTodo, handleUpdateTodo);
@@ -61,7 +79,7 @@ if (manager.getProjects()[0].getTodos().length === 0) {
 }
 
 // Initial render with selectProject callback
-renderProjects(manager, selectProject);
+renderProjects(manager, selectProject, handleDeleteProject);
 updateTodos();
 persist();
 
