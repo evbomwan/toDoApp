@@ -1,3 +1,10 @@
+import {format, parseISO, isValid} from "date-fns";
+function formatDueDate(dateString){
+  if (!dateString) return "No due date";
+  const date = parseISO(dateString);
+  if (!isValid(date)) return "No due date";
+  return format(date, "MMM d, yyyy");
+}
 // to render the project
 export function renderProjects(projectManager, selectProject, onDeleteProject) {
   const projectList = document.querySelector(".project-list");
@@ -97,7 +104,7 @@ export function renderTodos(project, onDeleteTodo, onUpdateTodo) {
     header.append(checkbox, title, priority);
 
     const dueDate = document.createElement("p");
-    dueDate.textContent = `Due: ${todo.dueDate || "No due date"}`;
+    dueDate.textContent = `Due: ${formatDueDate(todo.dueDate)}`;
     dueDate.classList.add("todo-date");
 
     const actions = document.createElement("div");
@@ -237,7 +244,7 @@ export function renderTodos(project, onDeleteTodo, onUpdateTodo) {
       description.textContent = todo.description || "No description provided";
       priority.textContent = todo.priority;
 
-      dueDate.textContent = `Due: ${todo.dueDate || "No due date"}`;
+      dueDate.textContent = `Due: ${formatDueDate(todo.dueDate)}`;
       exitEditMode();
       if (typeof onUpdateTodo === "function") {
         onUpdateTodo();
